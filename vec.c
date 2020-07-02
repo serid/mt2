@@ -49,4 +49,5 @@
     void vecDestroy_##TS(vec_##TS *self) { free(self->mem); }
 
 generate_vec_c(int, int);
-generate_vec_c(char, char)
+generate_vec_c(char, char);
+generate_vec_c(char*, str)

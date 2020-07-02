@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "vec.h"
 
@@ -37,6 +38,21 @@ const char* const CODE_TEMPLATE_END =
     "output_buffer_size = $-output_buffer\n";
 
 char* fasm_generate(void) {
-    vec_char buffer = vecNew_char();
-    return NULL;
+    vec_str lines = vecNew_str();
+    vecPush_str(&lines, "mov eax, 100\n");
+    vecPush_str(&lines, "mov ebx, 5\n");
+    vecPush_str(&lines, "add eax, ebx\n");
+
+    vec_char result = vecNew_char();
+    for (size_t i = 0; i < lines.len; i++) {
+        size_t j = 0;
+        while (lines.mem[i][j] != '\0') {
+            vecPush_char(&result, lines.mem[i][j]);
+            j++;
+        }
+        // free(lines.mem[i]); // Make sure not to free static-strings
+    }
+    vecPush_char(&result, '\0');
+
+    return result.mem;  // Caller should free the string
 }

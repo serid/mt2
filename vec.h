@@ -26,5 +26,6 @@
     void vecDestroy_##TS(vec_##TS *v);
 
 generate_vec_h(int, int);
-generate_vec_h(char, char)
+generate_vec_h(char, char);
+generate_vec_h(char*, str)
 #endif
