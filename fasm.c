@@ -37,6 +37,6 @@ const char* const CODE_TEMPLATE_END =
     "output_buffer_size = $-output_buffer\n";
 
 char* fasm_generate(void) {
-  vec_char buffer = vecNew_char();
-  return NULL;
+    vec_char buffer = vecNew_char();
+    return NULL;
 }
