@@ -5,6 +5,14 @@
 
 #define generate_vec_c(TT, TS)                                             \
     vec_##TS vecNew_##TS() { return (vec_##TS){0, 0, NULL}; }              \
+    vec_##TS vecNewWithLen_##TS(size_t len) {                              \
+        TT *mem = malloc(len * sizeof(TT));                                \
+        if (mem == NULL) {                                                 \
+            fprintf(stderr, "Unable to allocate vec with len\n");          \
+            exit(1);                                                       \
+        }                                                                  \
+        return (vec_##TS){len, len, mem};\
+    }                                                                      \
                                                                            \
     void _vecRecapacitate_##TS(vec_##TS *self, size_t capacity) {          \
         if (capacity == 0) {                                               \
@@ -50,4 +58,4 @@
 
 generate_vec_c(int, int);
 generate_vec_c(char, char);
-generate_vec_c(char*, str)
+generate_vec_c(char *, str)

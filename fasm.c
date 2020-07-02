@@ -43,16 +43,22 @@ char* fasm_generate(void) {
     vecPush_str(&lines, "mov ebx, 5\n");
     vecPush_str(&lines, "add eax, ebx\n");
 
-    vec_char result = vecNew_char();
+    size_t line_lens_sum = 0;
+    vec_int line_lens = vecNewWithLen_int(lines.len);
     for (size_t i = 0; i < lines.len; i++) {
-        size_t j = 0;
-        while (lines.mem[i][j] != '\0') {
-            vecPush_char(&result, lines.mem[i][j]);
-            j++;
-        }
-        // free(lines.mem[i]); // Make sure not to free static-strings
+        size_t len = strlen(lines.mem[i]);
+        line_lens_sum += len;
+        line_lens.mem[i] = len;
     }
-    vecPush_char(&result, '\0');
+
+    vec_char result = vecNewWithLen_char(line_lens_sum);
+    for (size_t i = 0, j = 0; i < lines.len; i++) {
+        strcpy(&result.mem[j], lines.mem[i]);
+        j += line_lens.mem[i];
+    }
+
+    vecDestroy_int(&line_lens);
+    vecDestroy_str(&lines);
 
     return result.mem;  // Caller should free the string
 }

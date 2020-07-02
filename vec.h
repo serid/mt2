@@ -13,6 +13,8 @@
                                                                   \
     vec_##TS vecNew_##TS();                                       \
                                                                   \
+    vec_##TS vecNewWithLen_##TS(size_t len);                               \
+                                                                  \
     void vecResize_##TS(vec_##TS *v, size_t new_len);             \
                                                                   \
     void _vecRecapacitate_##TS(vec_##TS *v, size_t new_capacity); \
@@ -27,5 +29,5 @@
 
 generate_vec_h(int, int);
 generate_vec_h(char, char);
-generate_vec_h(char*, str)
+generate_vec_h(char *, str)
 #endif
