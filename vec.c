@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "ints.h"
+
 #define generate_vec_c(TT, TS)                                             \
     vec_##TS vecNew_##TS() { return (vec_##TS){0, 0, NULL}; }              \
     vec_##TS vecNewWithLen_##TS(size_t len) {                              \
@@ -11,7 +13,7 @@
             fprintf(stderr, "Unable to allocate vec with len\n");          \
             exit(1);                                                       \
         }                                                                  \
-        return (vec_##TS){len, len, mem};\
+        return (vec_##TS){len, len, mem};                                  \
     }                                                                      \
                                                                            \
     void _vecRecapacitate_##TS(vec_##TS *self, size_t capacity) {          \
@@ -56,6 +58,6 @@
                                                                            \
     void vecDestroy_##TS(vec_##TS *self) { free(self->mem); }
 
-generate_vec_c(int, int);
+generate_vec_c(size_t, sizeT);
 generate_vec_c(char, char);
 generate_vec_c(char *, str)

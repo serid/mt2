@@ -8,11 +8,11 @@ int main(void) {
 
     puts(fasm_generate());
 
-    // vec_int vec1 = vecNew_int();
-    // vecPush_int(&vec1, 100);
-    // vecPush_int(&vec1, 200);
-    // printf("%"PRIi32"\n", vecPop_int(&vec1));
-    // printf("%"PRIi32"\n", vecPop_int(&vec1));
+    // vec_sizeT vec1 = vecNew_sizeT();
+    // vecPush_sizeT(&vec1, 100);
+    // vecPush_sizeT(&vec1, 200);
+    // printf("%"PRIi32"\n", vecPop_sizeT(&vec1));
+    // printf("%"PRIi32"\n", vecPop_sizeT(&vec1));
 
     // vec_float vec2 = vecNew_float();
     // vecPush_float(&vec2, 100);

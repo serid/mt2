@@ -44,7 +44,7 @@ char* fasm_generate(void) {
     vecPush_str(&lines, "add eax, ebx\n");
 
     size_t line_lens_sum = 0;
-    vec_int line_lens = vecNewWithLen_int(lines.len);
+    vec_sizeT line_lens = vecNewWithLen_sizeT(lines.len);
     for (size_t i = 0; i < lines.len; i++) {
         size_t len = strlen(lines.mem[i]);
         line_lens_sum += len;
@@ -57,7 +57,7 @@ char* fasm_generate(void) {
         j += line_lens.mem[i];
     }
 
-    vecDestroy_int(&line_lens);
+    vecDestroy_sizeT(&line_lens);
     vecDestroy_str(&lines);
 
     return result.mem;  // Caller should free the string

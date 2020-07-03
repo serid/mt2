@@ -13,7 +13,7 @@
                                                                   \
     vec_##TS vecNew_##TS();                                       \
                                                                   \
-    vec_##TS vecNewWithLen_##TS(size_t len);                               \
+    vec_##TS vecNewWithLen_##TS(size_t len);                      \
                                                                   \
     void vecResize_##TS(vec_##TS *v, size_t new_len);             \
                                                                   \
@@ -27,7 +27,7 @@
                                                                   \
     void vecDestroy_##TS(vec_##TS *v);
 
-generate_vec_h(int, int);
+generate_vec_h(size_t, sizeT);
 generate_vec_h(char, char);
 generate_vec_h(char *, str)
 #endif
