@@ -4,60 +4,51 @@
 #include <stdlib.h>
 
 #include "ints.h"
+#include "panic.h"
 #include "vec_ir_IrItem.h"
 #include "vec_ir_Proc.h"
 
-#define generate_vec_c(TT, TS)                                             \
-    vec_##TS vecNew_##TS() { return (vec_##TS){0, 0, NULL}; }              \
-    vec_##TS vecNewWithLen_##TS(size_t len) {                              \
-        TT *mem = malloc(len * sizeof(TT));                                \
-        if (mem == NULL) {                                                 \
-            fprintf(stderr, "Unable to allocate vec with len\n");          \
-            exit(1);                                                       \
-        }                                                                  \
-        return (vec_##TS){len, len, mem};                                  \
-    }                                                                      \
-                                                                           \
-    void _vecRecapacitate_##TS(vec_##TS *self, size_t capacity) {          \
-        if (capacity == 0) {                                               \
-            fprintf(stderr, "Recapacitate to 0 capacity is forbidden.\n"); \
-            return;                                                        \
-        }                                                                  \
-                                                                           \
-        TT *new_mem = realloc(self->mem, capacity * sizeof(TT));           \
-                                                                           \
-        if (new_mem == NULL) {                                             \
-            fprintf(stderr, "Unable to resize vec\n");                     \
-            exit(1);                                                       \
-        }                                                                  \
-                                                                           \
-        self->mem = new_mem;                                               \
-        self->_capacity = capacity;                                        \
-    }                                                                      \
-                                                                           \
-    void vecResize_##TS(vec_##TS *self, size_t len) {                      \
-        if (len > self->_capacity) {                                       \
-            _vecRecapacitate_##TS(self, len * 2);                          \
-        }                                                                  \
-                                                                           \
-        self->len = len;                                                   \
-    }                                                                      \
-                                                                           \
-    void vecPush_##TS(vec_##TS *self, TT e) {                              \
-        vecResize_##TS(self, self->len + 1);                               \
-        self->mem[self->len - 1] = e;                                      \
-    }                                                                      \
-                                                                           \
-    TT vecPop_##TS(vec_##TS *self) {                                       \
-        TT popped = self->mem[self->len - 1];                              \
-        vecResize_##TS(self, self->len - 1);                               \
-        return popped;                                                     \
-    }                                                                      \
-                                                                           \
-    void vecShrinkToFit_##TS(vec_##TS *self) {                             \
-        _vecRecapacitate_##TS(self, self->len);                            \
-    }                                                                      \
-                                                                           \
+#define generate_vec_c(TT, TS)                                                \
+    vec_##TS vecNew_##TS() { return (vec_##TS){0, 0, NULL}; }                 \
+    vec_##TS vecNewWithLen_##TS(size_t len) {                                 \
+        TT *mem = assert_nnull(malloc(len * sizeof(TT)),                      \
+                               "Unable to allocate vec with len.\n");         \
+        return (vec_##TS){len, len, mem};                                     \
+    }                                                                         \
+                                                                              \
+    void _vecRecapacitate_##TS(vec_##TS *self, size_t capacity) {             \
+        assert_ne(capacity, 0, "Recapacitate to 0 capacity is forbidden.\n"); \
+                                                                              \
+        TT *new_mem = assert_nnull(realloc(self->mem, capacity * sizeof(TT)), \
+                                   "Unable to resize vec.\n");                \
+                                                                              \
+        self->mem = new_mem;                                                  \
+        self->_capacity = capacity;                                           \
+    }                                                                         \
+                                                                              \
+    void vecResize_##TS(vec_##TS *self, size_t len) {                         \
+        if (len > self->_capacity) {                                          \
+            _vecRecapacitate_##TS(self, len * 2);                             \
+        }                                                                     \
+                                                                              \
+        self->len = len;                                                      \
+    }                                                                         \
+                                                                              \
+    void vecPush_##TS(vec_##TS *self, TT e) {                                 \
+        vecResize_##TS(self, self->len + 1);                                  \
+        self->mem[self->len - 1] = e;                                         \
+    }                                                                         \
+                                                                              \
+    TT vecPop_##TS(vec_##TS *self) {                                          \
+        TT popped = self->mem[self->len - 1];                                 \
+        vecResize_##TS(self, self->len - 1);                                  \
+        return popped;                                                        \
+    }                                                                         \
+                                                                              \
+    void vecShrinkToFit_##TS(vec_##TS *self) {                                \
+        _vecRecapacitate_##TS(self, self->len);                               \
+    }                                                                         \
+                                                                              \
     void vecDestroy_##TS(vec_##TS *self) { free(self->mem); }
 
 generate_vec_c(size_t, sizeT);

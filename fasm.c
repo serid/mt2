@@ -5,15 +5,13 @@
 #include <string.h>
 
 #include "ir.h"
+#include "panic.h"
 #include "vec.h"
 
 // TODO: allocate and free strings in fasm_generate
 char* str_clone(char* str) {
-    char* mem = malloc(strlen(str) + 1);
-    if (mem == NULL) {
-        fprintf(stderr, "Unable to allocate string\n");
-        exit(1);
-    }
+    char* mem =
+        assert_nnull(malloc(strlen(str) + 1), "Unable to allocate string\n");
     return strcpy(mem, str);
 }
 
@@ -106,11 +104,9 @@ char* fasm_generate(ir_Program program) {
                     // }
 
                     char* buffer;
-                    if (asprintf(&buffer, "mov dword [ebp-%zu], %u\n",
-                                 val_number * 4, item.data.int_lit) == -1) {
-                        fprintf(stderr, "Formatting error.\n");
-                        exit(1);
-                    }
+                    assert_nm1(asprintf(&buffer, "mov dword [ebp-%zu], %u\n",
+                                        val_number * 4, item.data.int_lit),
+                               "Formatting error.\n");
                     vecPush_str(&lines, buffer);
                     break;
                 }
@@ -122,27 +118,21 @@ char* fasm_generate(ir_Program program) {
                         // Builtin add
                         char* buffer;
                         // mov ebx, [ebp-arg1_valnum*4]\n
-                        if (asprintf(&buffer, "mov ebx, [ebp-%u]\n",
-                                     func.arg1_valnum * 4) == -1) {
-                            fprintf(stderr, "Formatting error.\n");
-                            exit(1);
-                        }
+                        assert_nm1(asprintf(&buffer, "mov ebx, [ebp-%u]\n",
+                                            func.arg1_valnum * 4),
+                                   "Formatting error.\n");
                         vecPush_str(&lines, buffer);
 
                         // add ebx, [ebp-arg2_valnum*4]\n
-                        if (asprintf(&buffer, "add ebx, [ebp-%u]\n",
-                                     func.arg2_valnum * 4) == -1) {
-                            fprintf(stderr, "Formatting error.\n");
-                            exit(1);
-                        }
+                        assert_nm1(asprintf(&buffer, "add ebx, [ebp-%u]\n",
+                                            func.arg2_valnum * 4),
+                                   "Formatting error.\n");
                         vecPush_str(&lines, buffer);
 
                         // mov [ebp-val_number*4], ebx\n
-                        if (asprintf(&buffer, "mov [ebp-%zu], ebx\n",
-                                     val_number * 4) == -1) {
-                            fprintf(stderr, "Formatting error.\n");
-                            exit(1);
-                        }
+                        assert_nm1(asprintf(&buffer, "mov [ebp-%zu], ebx\n",
+                                            val_number * 4),
+                                   "Formatting error.\n");
                         vecPush_str(&lines, buffer);
                     } else {
                         // Call func <func.func_name>
@@ -152,7 +142,7 @@ char* fasm_generate(ir_Program program) {
                 }
 
                 default:
-                    fprintf(stderr, "Unknown item.tag\n");
+                    panic("Unknown item.tag\n");
                     exit(1);
                     break;
             }
@@ -161,11 +151,8 @@ char* fasm_generate(ir_Program program) {
         // Write last Val to eax
         char* buffer;
         // mov ebx, [ebp-arg1_valnum*4]\n
-        if (asprintf(&buffer, "mov eax, [ebp-%u]\n",
-                     (i_proc.code.len - 1 + 1) * 4) == -1) {
-            fprintf(stderr, "Formatting error.\n");
-            exit(1);
-        }
+        assert_nm1(asprintf(&buffer, "mov eax, [ebp-%u]\n",
+                     (i_proc.code.len - 1 + 1) * 4), "Formatting error.\n");
         vecPush_str(&lines, buffer);
 
         vecPush_str(&lines, str_clone("pop ebp\n"));
