@@ -1,5 +1,4 @@
-#ifndef IR_IRITEM_H
-#define IR_IRITEM_H
+#pragma once
 #include "ints.h"
 typedef struct {
     char* func_name;
@@ -17,4 +16,3 @@ typedef struct  // Operators that may be called in SSassignment
         ir_FuncCall func_call;
     } data;
 } ir_IrItem;
-#endif

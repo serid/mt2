@@ -1,5 +1,4 @@
-#ifndef VEC_H
-#define VEC_H
+#pragma once
 #include <stdlib.h>
 
 #include "ints.h"
@@ -30,4 +29,3 @@
 generate_vec_h(size_t, sizeT);
 generate_vec_h(char, char);
 generate_vec_h(char *, str)
-#endif

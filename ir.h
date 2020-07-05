@@ -1,5 +1,4 @@
-#ifndef IR_H
-#define IR_H
+#pragma once
 #include "ints.h"
 #include "vec_ir_Proc.h"
 // Program is a list of procedures
@@ -8,4 +7,3 @@
 typedef struct {
     vec_ir_Proc procs;
 } ir_Program;
-#endif
