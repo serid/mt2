@@ -61,35 +61,15 @@ vec_char fasm_generate(ir_Program program) {
         vecPush_str(&lines, str_clone("push ebp\n"));
         vecPush_str(&lines, str_clone("mov ebp, esp\n"));
 
-        // Val is a variable only assigned once
-        // i_proc.code.len is number of Vals
-
         for (size_t j = 0; j < i_proc.code.len; j++) {
             ir_IrItem item = i_proc.code.mem[j];
-            size_t val_number = j + 1;
             switch (item.tag) {
                 case IR_ITEM_TAG_INT_LIT: {
-                    // move const to a Val
-                    // mov dword [ebp-<val_number*4>], <item.data.int_lit>
-
-                    // vecPush_str(&lines, "mov dword [ebp-");
-                    // vecPush_str(&lines, sizeTtoa(val_number * 4));
-                    // vecPush_str(&lines, "],");
-                    // vecPush_str(&lines, u32toa(item.data.int_lit));
-                    // vecPush_str(&lines, "\n");
-
-                    // char* buffer = malloc(256);
-                    // int result =
-                    //     snprintf(buffer, 256, "mov dword [ebp-%zu],%u\n",
-                    //              val_number * 4, item.data.int_lit);
-                    // if (result > 256) {
-                    //     fprintf(stderr, "Format result too big.\n");
-                    //     exit(1);
-                    // }
-
+                    // move const to a Var
+                    // mov dword [ebp-<var_number*4>], <item.data.int_lit>
                     char* buffer;
-                    assert_nm1(asprintf(&buffer, "mov dword [ebp-%zu], %u\n",
-                                        val_number * 4, item.data.int_lit),
+                    assert_nm1(asprintf(&buffer, "mov dword [ebp-%i], %u\n",
+                                        item.var_num * 4, item.data.int_lit),
                                "Formatting error.\n");
                     vecPush_str(&lines, buffer);
                     break;
@@ -101,21 +81,21 @@ vec_char fasm_generate(ir_Program program) {
                     if (strcmp(func.func_name, "add") == 0) {
                         // Builtin add
                         char* buffer;
-                        // mov ebx, [ebp-arg1_valnum*4]\n
+                        // mov ebx, [ebp-arg1_varnum*4]\n
                         assert_nm1(asprintf(&buffer, "mov ebx, [ebp-%u]\n",
-                                            func.arg1_valnum * 4),
+                                            func.arg1_varnum * 4),
                                    "Formatting error.\n");
                         vecPush_str(&lines, buffer);
 
-                        // add ebx, [ebp-arg2_valnum*4]\n
+                        // add ebx, [ebp-arg2_varnum*4]\n
                         assert_nm1(asprintf(&buffer, "add ebx, [ebp-%u]\n",
-                                            func.arg2_valnum * 4),
+                                            func.arg2_varnum * 4),
                                    "Formatting error.\n");
                         vecPush_str(&lines, buffer);
 
-                        // mov [ebp-val_number*4], ebx\n
-                        assert_nm1(asprintf(&buffer, "mov [ebp-%zu], ebx\n",
-                                            val_number * 4),
+                        // mov [ebp-var_num*4], ebx\n
+                        assert_nm1(asprintf(&buffer, "mov [ebp-%i], ebx\n",
+                                            item.var_num * 4),
                                    "Formatting error.\n");
                         vecPush_str(&lines, buffer);
                     } else {
@@ -132,11 +112,18 @@ vec_char fasm_generate(ir_Program program) {
             }
         }
 
-        // Write last Val to eax
+        // Write last Var to eax
+        u16 max = 0;
+        {  // Find max var_num
+            for (size_t j = 0; j < i_proc.code.len; j++) {
+                if (i_proc.code.mem[j].var_num > max) {
+                    max = i_proc.code.mem[j].var_num;
+                }
+            }
+        }
         char* buffer;
-        // mov ebx, [ebp-arg1_valnum*4]\n
-        assert_nm1(asprintf(&buffer, "mov eax, [ebp-%u]\n",
-                            (i_proc.code.len - 1 + 1) * 4),
+        // mov ebx, [ebp-arg1_varnum*4]\n
+        assert_nm1(asprintf(&buffer, "mov eax, [ebp-%u]\n", max * 4),
                    "Formatting error.\n");
         vecPush_str(&lines, buffer);
 
