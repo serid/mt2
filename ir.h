@@ -8,3 +8,7 @@
 typedef struct {
     vec_ir_Proc procs;
 } ir_Program;
+
+ir_Program compile(char* text);
+
+void destroy_ir_Program(ir_Program* program);
