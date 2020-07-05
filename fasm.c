@@ -60,7 +60,7 @@ const char* const CODE_TEMPLATE_END =
     "output_buffer db 'eeeee',0xA\n"
     "output_buffer_size = $-output_buffer\n";
 
-char* fasm_generate(ir_Program program) {
+vec_char fasm_generate(ir_Program program) {
     vec_str lines = vecNew_str();
 
     // CODE_TEMPLATE_START
@@ -185,5 +185,5 @@ char* fasm_generate(ir_Program program) {
     vecDestroy_sizeT(&line_lens);
     vecDestroy_str(&lines);
 
-    return result.mem;  // Caller should free the string
+    return result;
 }
