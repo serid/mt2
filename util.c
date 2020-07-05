@@ -9,7 +9,7 @@
 
 #include "panic.h"
 
-char* str_clone(char* str) {
+char* str_clone(const char* str) {
     char* mem =
         assert_pnnull(malloc(strlen(str) + 1), "Unable to allocate string\n");
     return strcpy(mem, str);
