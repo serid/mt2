@@ -11,7 +11,7 @@
 // TODO: allocate and free strings in fasm_generate
 char* str_clone(char* str) {
     char* mem =
-        assert_nnull(malloc(strlen(str) + 1), "Unable to allocate string\n");
+        assert_pnnull(malloc(strlen(str) + 1), "Unable to allocate string\n");
     return strcpy(mem, str);
 }
 

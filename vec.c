@@ -11,7 +11,7 @@
 #define generate_vec_c(TT, TS)                                                \
     vec_##TS vecNew_##TS() { return (vec_##TS){0, 0, NULL}; }                 \
     vec_##TS vecNewWithLen_##TS(size_t len) {                                 \
-        TT *mem = assert_nnull(malloc(len * sizeof(TT)),                      \
+        TT *mem = assert_pnnull(malloc(len * sizeof(TT)),                      \
                                "Unable to allocate vec with len.\n");         \
         return (vec_##TS){len, len, mem};                                     \
     }                                                                         \
@@ -19,7 +19,7 @@
     void _vecRecapacitate_##TS(vec_##TS *self, size_t capacity) {             \
         assert_ne(capacity, 0, "Recapacitate to 0 capacity is forbidden.\n"); \
                                                                               \
-        TT *new_mem = assert_nnull(realloc(self->mem, capacity * sizeof(TT)), \
+        TT *new_mem = assert_pnnull(realloc(self->mem, capacity * sizeof(TT)), \
                                    "Unable to resize vec.\n");                \
                                                                               \
         self->mem = new_mem;                                                  \
