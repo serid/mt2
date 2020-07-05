@@ -32,5 +32,8 @@ int main(void) {
     write_bytes("out.fasm", &compiled_code);
     vecDestroy_char(&compiled_code);
 
+    vecDestroy_ir_IrItem(&some_proc.code);
+    vecDestroy_ir_Proc(&program.procs);
+
     return 0;
 }
