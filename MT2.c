@@ -5,8 +5,14 @@
 #include "panic.h"
 #include "util.h"
 
-int main(void) {
+int main(int argc, char* argv[]) {
     puts("Hello, world!");
+
+    if (argc < 2)
+    {
+        fputs("Usage: MT2 [OUTPUT_FILE_NAME]\n", stderr);
+        exit(1);
+    }
 
     ir_IrItem item;
 
@@ -29,7 +35,7 @@ int main(void) {
     vecPush_ir_Proc(&program.procs, some_proc);
 
     vec_char compiled_code = fasm_generate(program);
-    write_bytes("out.fasm", &compiled_code);
+    write_bytes(argv[1], &compiled_code);
     vecDestroy_char(&compiled_code);
 
     vecDestroy_ir_IrItem(&some_proc.code);
