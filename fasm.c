@@ -1,28 +1,12 @@
 #define _GNU_SOURCE
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "ir.h"
 #include "panic.h"
+#include "util.h"
 #include "vec.h"
-
-// TODO: allocate and free strings in fasm_generate
-char* str_clone(char* str) {
-    char* mem =
-        assert_pnnull(malloc(strlen(str) + 1), "Unable to allocate string\n");
-    return strcpy(mem, str);
-}
-
-// strcpy, no null terminator. Like strcpy, but omits null terminator.
-void strcpy_nonnt(char* restrict dest, const char* restrict src) {
-    size_t i = 0;
-    while (src[i] != 0) {
-        dest[i] = src[i];
-        i++;
-    }
-}
 
 const char* const CODE_TEMPLATE_START =
     "format ELF executable 3\n"
@@ -152,7 +136,8 @@ vec_char fasm_generate(ir_Program program) {
         char* buffer;
         // mov ebx, [ebp-arg1_valnum*4]\n
         assert_nm1(asprintf(&buffer, "mov eax, [ebp-%u]\n",
-                     (i_proc.code.len - 1 + 1) * 4), "Formatting error.\n");
+                            (i_proc.code.len - 1 + 1) * 4),
+                   "Formatting error.\n");
         vecPush_str(&lines, buffer);
 
         vecPush_str(&lines, str_clone("pop ebp\n"));

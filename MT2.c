@@ -1,21 +1,9 @@
-#include <fcntl.h>
-#include <inttypes.h>
 #include <stdio.h>
-#include <unistd.h>
 
 #include "fasm.h"
 #include "ir.h"
 #include "panic.h"
-
-void write_bytes(char* filename, vec_char* bytes) {
-    int fd = assert_nm1_errno(open("out.fasm", O_RDWR | O_CREAT | O_TRUNC,
-                                   S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH),
-                              "File creation failed");
-    if (write(fd, bytes->mem, bytes->len) != bytes->len) {
-        panic_errno("File write");
-    }
-    close(fd);
-}
+#include "util.h"
 
 int main(void) {
     puts("Hello, world!");
