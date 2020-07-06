@@ -3,6 +3,7 @@
 #include "fasm.h"
 #include "ir.h"
 #include "panic.h"
+#include "tok.h"
 #include "util.h"
 
 int main(int argc, char* argv[]) {
@@ -13,7 +14,13 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    ir_Program program = compile("");
+    vec_tok toks = tokenize("proc proc 1000 aa");
+
+    // Print tokens
+    for (size_t i = 0; i < toks.len; i++) printf("%i,", toks.mem[i].tag);
+    putc('\n', stdout);
+
+    ir_Program program = compile(toks);
 
     vec_char compiled_code = fasm_generate(program);
     write_bytes(argv[1], &compiled_code);

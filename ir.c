@@ -1,6 +1,6 @@
 #include "ir.h"
 
-ir_Program compile(char* text) {
+ir_Program compile(vec_tok toks) {
     ir_IrItem item;
 
     ir_Proc some_proc;
