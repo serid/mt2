@@ -22,6 +22,8 @@ int main(int argc, char* argv[]) {
 
     ir_Program program = compile(toks);
 
+    vecDestroy_tok(&toks);
+
     vec_char compiled_code = fasm_generate(program);
     write_bytes(argv[1], &compiled_code);
     vecDestroy_char(&compiled_code);
