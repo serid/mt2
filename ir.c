@@ -1,6 +1,7 @@
 #include "ir.h"
 
 #include "panic.h"
+#include "util.h"
 #include "vec_ir_stack_item.h"
 
 ir_Program compile(vec_tok toks) {
@@ -61,7 +62,7 @@ ir_Program compile(vec_tok toks) {
                 (ir_IrItem){.var_num = var_num.data.int_lit,
                             .tag = IR_ITEM_TAG_FUNC_CALL,
                             .data.func_call = (ir_FuncCall){
-                                .func_name = func_name.data.name,
+                                .func_name = str_clone(func_name.data.name),
                                 .arg1_varnum = arg1_varnum.data.int_lit,
                                 .arg2_varnum = arg2_varnum.data.int_lit}});
         } else if (i_token->tag == TOK_IDENT) {
@@ -74,12 +75,28 @@ ir_Program compile(vec_tok toks) {
                 panic("Identifier expected.");
             }
 
-            some_proc.name = name.data.name;
+            some_proc.name = str_clone(name.data.name);
             vecPush_ir_Proc(&program.procs, some_proc);
         }
     }
 
+    if (stack.len != 0) panic("Trailing tokens in program.");
+
+    vecDestroy_ir_stack_item(&stack);
+
     return program;
+}
+
+void destroy_ir_IrItem(ir_IrItem* item) {
+    if (item->tag == IR_ITEM_TAG_FUNC_CALL)
+        free(item->data.func_call.func_name);
+}
+
+void destroy_ir_Proc(ir_Proc* proc) {
+    for (size_t i = 0; i < proc->code.len; i++)
+        destroy_ir_IrItem(&proc->code.mem[i]);
+    free(proc->name);
+    vecDestroy_ir_IrItem(&proc->code);
 }
 
 void destroy_ir_Program(ir_Program* program) {
@@ -88,4 +105,3 @@ void destroy_ir_Program(ir_Program* program) {
     vecDestroy_ir_Proc(&program->procs);
 }
 
-void destroy_ir_Proc(ir_Proc* proc) { vecDestroy_ir_IrItem(&proc->code); }

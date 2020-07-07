@@ -17,3 +17,5 @@ typedef struct  // Assignment
         ir_FuncCall func_call;
     } data;
 } ir_IrItem;
+
+void destroy_ir_IrItem(ir_IrItem* item);

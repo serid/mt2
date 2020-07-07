@@ -26,6 +26,12 @@ int main(int argc, char* argv[]) {
 
     ir_Program program = compile(toks);
 
+    for (size_t i = 0; i < toks.len; i++)
+    {
+        if (toks.mem[i].tag == TOK_IDENT)
+            free(toks.mem[i].data.name);
+    }
+    
     vecDestroy_tok(&toks);
 
     vec_char compiled_code = fasm_generate(program);
