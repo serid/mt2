@@ -1,29 +1,83 @@
 #include "ir.h"
 
+#include "panic.h"
+#include "vec_ir_stack_item.h"
+
 ir_Program compile(vec_tok toks) {
-    ir_IrItem item;
+    // Stack parser
+    vec_ir_stack_item stack = vecNew_ir_stack_item();
 
     ir_Proc some_proc;
-    some_proc.name = "main";
     some_proc.code = vecNew_ir_IrItem();
-
-    item.var_num = 1;
-    item.tag = 1;
-    item.data.int_lit = 100;
-    vecPush_ir_IrItem(&some_proc.code, item);
-    item.var_num = 2;
-    item.tag = 1;
-    item.data.int_lit = 50;
-    vecPush_ir_IrItem(&some_proc.code, item);
-    item.var_num = 3;
-    item.tag = 2;
-    item.data.func_call = (ir_FuncCall){"add", 1, 2};
-    vecPush_ir_IrItem(&some_proc.code, item);
-
     ir_Program program;
-
     program.procs = vecNew_ir_Proc();
-    vecPush_ir_Proc(&program.procs, some_proc);
+
+    for (size_t i = 0; i < toks.len; i++) {
+        tok* i_token = &toks.mem[i];
+        if (i_token->tag == TOK_INT_LIT) {
+            vecPush_ir_stack_item(
+                &stack, (ir_stack_item){.tag = IR_STACK_ITEM_INT_LIT,
+                                        .data.int_lit = i_token->data.int_lit});
+        } else if (i_token->tag == TOK_ASSIGN) {
+            // Add an assignment to a procedure
+            ir_stack_item what = vecPop_ir_stack_item(&stack);  // tos1
+            if (what.tag != IR_STACK_ITEM_INT_LIT) {
+                panic("Int literal expected.");
+            }
+
+            ir_stack_item var_num = vecPop_ir_stack_item(&stack);  // tos2
+            if (what.tag != IR_STACK_ITEM_INT_LIT) {
+                panic("Int literal (varnum) expected.");
+            }
+
+            vecPush_ir_IrItem(&some_proc.code,
+                              (ir_IrItem){.var_num = var_num.data.int_lit,
+                                          .tag = IR_ITEM_TAG_INT_LIT,
+                                          .data.int_lit = what.data.int_lit});
+        } else if (i_token->tag == TOK_CALL) {
+            // Call a function and add an assignment to a procedure
+            ir_stack_item func_name = vecPop_ir_stack_item(&stack);  // tos1
+            if (func_name.tag != IR_STACK_ITEM_IDENT) {
+                panic("Identifier expected.");
+            }
+
+            ir_stack_item arg1_varnum = vecPop_ir_stack_item(&stack);  // tos2
+            if (arg1_varnum.tag != IR_STACK_ITEM_INT_LIT) {
+                panic("Int literal expected.");
+            }
+
+            ir_stack_item arg2_varnum = vecPop_ir_stack_item(&stack);  // tos3
+            if (arg2_varnum.tag != IR_STACK_ITEM_INT_LIT) {
+                panic("Int literal expected.");
+            }
+
+            ir_stack_item var_num = vecPop_ir_stack_item(&stack);  // tos4
+            if (var_num.tag != IR_STACK_ITEM_INT_LIT) {
+                panic("Int literal expected.");
+            }
+
+            vecPush_ir_IrItem(
+                &some_proc.code,
+                (ir_IrItem){.var_num = var_num.data.int_lit,
+                            .tag = IR_ITEM_TAG_FUNC_CALL,
+                            .data.func_call = (ir_FuncCall){
+                                .func_name = func_name.data.name,
+                                .arg1_varnum = arg1_varnum.data.int_lit,
+                                .arg2_varnum = arg2_varnum.data.int_lit}});
+        } else if (i_token->tag == TOK_IDENT) {
+            vecPush_ir_stack_item(
+                &stack, (ir_stack_item){.tag = IR_STACK_ITEM_IDENT,
+                                        .data.name = i_token->data.name});
+        } else if (i_token->tag == TOK_MAKEPROC) {
+            ir_stack_item name = vecPop_ir_stack_item(&stack);  // tos1
+            if (name.tag != IR_STACK_ITEM_IDENT) {
+                panic("Identifier expected.");
+            }
+
+            some_proc.name = name.data.name;
+            vecPush_ir_Proc(&program.procs, some_proc);
+        }
+    }
 
     return program;
 }
@@ -34,6 +88,4 @@ void destroy_ir_Program(ir_Program* program) {
     vecDestroy_ir_Proc(&program->procs);
 }
 
-void destroy_ir_Proc(ir_Proc* proc) {
-    vecDestroy_ir_IrItem(&proc->code);
-}
+void destroy_ir_Proc(ir_Proc* proc) { vecDestroy_ir_IrItem(&proc->code); }

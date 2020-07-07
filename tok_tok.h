@@ -2,13 +2,15 @@
 #include "ints.h"
 
 #define TOK_LS 1
-#define TOK_PROC 2
-#define TOK_INT_LIT 3
-#define TOK_IDENT 4
+#define TOK_MAKEPROC 2
+#define TOK_CALL 3
+#define TOK_ASSIGN 4
+#define TOK_INT_LIT 5
+#define TOK_IDENT 6
 typedef struct {
     u8 tag;
-    union internal {
-        u32 int_lit;  // tag 3
-        char* name; // tag 4
+    union {
+        u32 int_lit;  // tag TOK_INT_LIT
+        char* name;   // tag TOK_IDENT
     } data;
 } tok;

@@ -14,7 +14,11 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    vec_tok toks = tokenize("proc proc 1000 aa");
+    vec_tok toks = tokenize(
+        "0 100 =\n"
+        "1 50 =\n"
+        "2 0 1 add call\n"
+        "main makeproc\n");
 
     // Print tokens
     for (size_t i = 0; i < toks.len; i++) printf("%i,", toks.mem[i].tag);

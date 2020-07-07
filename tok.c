@@ -23,22 +23,32 @@ vec_tok tokenize(char* text) {
         }
 
         if (text[i] == '\n') {
-            vecPush_tok(&result, (tok){.tag = 1});
+            vecPush_tok(&result, (tok){.tag = TOK_LS});
             i += 1;
-        } else if (compare_sub(&text[i], "proc")) {
-            vecPush_tok(&result, (tok){.tag = 2});
+        } else if (text[i] == '=') {
+            vecPush_tok(&result, (tok){.tag = TOK_ASSIGN});
+            i += 1;
+        } else if (compare_sub(&text[i], "call")) {
+            vecPush_tok(&result, (tok){.tag = TOK_CALL});
             i += 4;
+        } else if (compare_sub(&text[i], "makeproc")) {
+            vecPush_tok(&result, (tok){.tag = TOK_MAKEPROC});
+            i += 8;
         } else if (isdigit(text[i])) {
             char* end;
             errno = 0;  // Do I need no zero it?
             long res = strtol(&text[i], &end, 10);
             if (errno == ERANGE) panic_errno("Int parse");
-            vecPush_tok(&result, (tok){.tag = 3, .data.int_lit = res});
+            vecPush_tok(&result,
+                        (tok){.tag = TOK_INT_LIT, .data.int_lit = res});
             i += end - (text + i);
         } else {
-            // TODO: identifiers
-            vecPush_tok(&result, (tok){.tag = 0});
-            i++;
+            vec_char name = vecNew_char();
+            for (; isalpha(text[i]); i++) vecPush_char(&name, text[i]);
+            vecPush_char(&name, '\0');
+
+            vecPush_tok(&result,
+                        (tok){.tag = TOK_IDENT, .data.name = name.mem});
         }
     }
     return result;

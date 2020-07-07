@@ -7,4 +7,4 @@ set(CMAKE_CXX_COMPILER "clang")
 
 add_executable(MT2 MT2.c vec.c vec.h panic.c panic.h util.c util.h
     tok.c tok.h tok_tok.h vec_tok.h fasm.c fasm.h ir.c ir.h ir_Proc.h ir_IrItem.h
-    vec_ir_Proc.h vec_ir_IrItem.h ints.h)
+    ir_stack_item.h vec_ir_stack_item.h vec_ir_Proc.h vec_ir_IrItem.h ints.h)
