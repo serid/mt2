@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    vec_tok toks = tokenize(
+    vec_Tok toks = tokenize(
         "0 100 =\n"
         "1 50 =\n"
         "2 0 1 add call\n"
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
             free(toks.mem[i].data.name);
     }
     
-    vecDestroy_tok(&toks);
+    vecDestroy_Tok(&toks);
 
     vec_char compiled_code = fasm_generate(program);
     write_bytes(argv[1], &compiled_code);

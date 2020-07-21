@@ -10,4 +10,4 @@ typedef struct {
         char* name;   // tag IR_STACK_ITEM_IDENT
 
     } data;
-} ir_stack_item;
+} ir_StackItem;

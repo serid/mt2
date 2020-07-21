@@ -13,4 +13,4 @@ typedef struct {
         u32 int_lit;  // tag TOK_INT_LIT
         char* name;   // tag TOK_IDENT
     } data;
-} tok;
+} Tok;

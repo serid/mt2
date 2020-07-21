@@ -5,10 +5,10 @@
 
 #include "ints.h"
 #include "panic.h"
-#include "vec_tok.h"
+#include "vec_Tok.h"
 #include "vec_ir_IrItem.h"
 #include "vec_ir_Proc.h"
-#include "vec_ir_stack_item.h"
+#include "vec_ir_StackItem.h"
 
 #define generate_vec_c(TT, TS)                                                \
     vec_##TS vecNew_##TS() { return (vec_##TS){0, 0, NULL}; }                 \
@@ -57,7 +57,7 @@ generate_vec_c(size_t, sizeT);
 generate_vec_c(char, char);
 generate_vec_c(char *, str);
 
-generate_vec_c(tok, tok)
+generate_vec_c(Tok, Tok)
 generate_vec_c(ir_IrItem, ir_IrItem);
 generate_vec_c(ir_Proc, ir_Proc)
-generate_vec_c(ir_stack_item, ir_stack_item)
+generate_vec_c(ir_StackItem, ir_StackItem)
