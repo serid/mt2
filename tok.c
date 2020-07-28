@@ -1,5 +1,7 @@
 #include "tok.h"
 
+#include <stdio.h>
+
 #include "ctype.h"
 #include "errno.h"
 #include "panic.h"
@@ -42,13 +44,16 @@ vec_Tok tokenize(char* text) {
             vecPush_Tok(&result,
                         (Tok){.tag = TOK_INT_LIT, .data.int_lit = res});
             i += end - (text + i);
-        } else {
+        } else if (isalpha(text[i])) {
             vec_char name = vecNew_char();
             for (; isalpha(text[i]); i++) vecPush_char(&name, text[i]);
             vecPush_char(&name, '\0');
 
             vecPush_Tok(&result,
                         (Tok){.tag = TOK_IDENT, .data.name = name.mem});
+        } else {
+            fputs("Unknown token.\n", stderr);
+            exit(1);
         }
     }
     return result;
