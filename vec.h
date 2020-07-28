@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "ints.h"
@@ -25,6 +26,8 @@
     TT vecPop_##TS(vec_##TS *self);                                  \
                                                                      \
     void vecShrinkToFit_##TS(vec_##TS *self);                        \
+                                                                     \
+    bool vecIsEmpty_##TS(vec_##TS *self);                            \
                                                                      \
     void vecDestroy_##TS(vec_##TS *self);
 

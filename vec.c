@@ -1,7 +1,6 @@
 #include "vec.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "ints.h"
 #include "panic.h"
@@ -57,6 +56,8 @@
     void vecShrinkToFit_##TS(vec_##TS *self) {                                 \
         _vecRecapacitate_##TS(self, self->len);                                \
     }                                                                          \
+                                                                               \
+    bool vecIsEmpty_##TS(vec_##TS *self) { return self->len == 0; }            \
                                                                                \
     void vecDestroy_##TS(vec_##TS *self) { free(self->mem); }
 
