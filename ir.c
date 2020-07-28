@@ -18,17 +18,23 @@ ir_Program compile(vec_Tok toks) {
         if (i_token->tag == TOK_INT_LIT) {
             vecPush_ir_StackItem(
                 &stack, (ir_StackItem){.tag = IR_STACK_ITEM_INT_LIT,
-                                        .data.int_lit = i_token->data.int_lit});
+                                       .data.int_lit = i_token->data.int_lit});
         } else if (i_token->tag == TOK_ASSIGN) {
             // Add an assignment to a procedure
+            if (vecIsEmpty_ir_StackItem(&stack)) {
+                panic("Stack is empty! Int literal expected.\n");
+            }
             ir_StackItem what = vecPop_ir_StackItem(&stack);  // tos1
             if (what.tag != IR_STACK_ITEM_INT_LIT) {
-                panic("Int literal expected.");
+                panic("Int literal expected.\n");
             }
 
+            if (vecIsEmpty_ir_StackItem(&stack)) {
+                panic("Stack is empty! Int literal expected.\n");
+            }
             ir_StackItem var_num = vecPop_ir_StackItem(&stack);  // tos2
             if (what.tag != IR_STACK_ITEM_INT_LIT) {
-                panic("Int literal (varnum) expected.");
+                panic("Int literal expected.\n");
             }
 
             vecPush_ir_IrItem(&some_proc.code,
@@ -37,24 +43,36 @@ ir_Program compile(vec_Tok toks) {
                                           .data.int_lit = what.data.int_lit});
         } else if (i_token->tag == TOK_CALL) {
             // Call a function and add an assignment to a procedure
+            if (vecIsEmpty_ir_StackItem(&stack)) {
+                panic("Stack is empty! Identifier expected.\n");
+            }
             ir_StackItem func_name = vecPop_ir_StackItem(&stack);  // tos1
             if (func_name.tag != IR_STACK_ITEM_IDENT) {
-                panic("Identifier expected.");
+                panic("Identifier expected.\n");
             }
 
+            if (vecIsEmpty_ir_StackItem(&stack)) {
+                panic("Stack is empty! Int literal expected.\n");
+            }
             ir_StackItem arg1_varnum = vecPop_ir_StackItem(&stack);  // tos2
             if (arg1_varnum.tag != IR_STACK_ITEM_INT_LIT) {
-                panic("Int literal expected.");
+                panic("Int literal expected.\n");
             }
 
+            if (vecIsEmpty_ir_StackItem(&stack)) {
+                panic("Stack is empty! Int literal expected.\n");
+            }
             ir_StackItem arg2_varnum = vecPop_ir_StackItem(&stack);  // tos3
             if (arg2_varnum.tag != IR_STACK_ITEM_INT_LIT) {
-                panic("Int literal expected.");
+                panic("Int literal expected.\n");
             }
 
+            if (vecIsEmpty_ir_StackItem(&stack)) {
+                panic("Stack is empty! Int literal expected.\n");
+            }
             ir_StackItem var_num = vecPop_ir_StackItem(&stack);  // tos4
             if (var_num.tag != IR_STACK_ITEM_INT_LIT) {
-                panic("Int literal expected.");
+                panic("Int literal expected.\n");
             }
 
             vecPush_ir_IrItem(
@@ -68,11 +86,14 @@ ir_Program compile(vec_Tok toks) {
         } else if (i_token->tag == TOK_IDENT) {
             vecPush_ir_StackItem(
                 &stack, (ir_StackItem){.tag = IR_STACK_ITEM_IDENT,
-                                        .data.name = i_token->data.name});
+                                       .data.name = i_token->data.name});
         } else if (i_token->tag == TOK_MAKEPROC) {
+            if (vecIsEmpty_ir_StackItem(&stack)) {
+                panic("Stack is empty! Identifier expected.\n");
+            }
             ir_StackItem name = vecPop_ir_StackItem(&stack);  // tos1
             if (name.tag != IR_STACK_ITEM_IDENT) {
-                panic("Identifier expected.");
+                panic("Identifier expected.\n");
             }
 
             some_proc.name = str_clone(name.data.name);
@@ -80,7 +101,7 @@ ir_Program compile(vec_Tok toks) {
         }
     }
 
-    if (stack.len != 0) panic("Trailing tokens in program.");
+    if (stack.len != 0) panic("Trailing tokens in program.\n");
 
     vecDestroy_ir_StackItem(&stack);
 
@@ -104,4 +125,3 @@ void destroy_ir_Program(ir_Program* program) {
         destroy_ir_Proc(&program->procs.mem[i]);
     vecDestroy_ir_Proc(&program->procs);
 }
-
