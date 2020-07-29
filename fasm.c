@@ -8,6 +8,13 @@
 #include "util.h"
 #include "vec.h"
 
+static u32 max_my(u32 a, u32 b) {
+    if (a > b)
+        return a;
+    else
+        return b;
+}
+
 const char* const CODE_TEMPLATE_START =
     "format ELF executable 3\n"
     "entry start\n"
@@ -71,6 +78,12 @@ vec_char fasm_generate(ir_Program program) {
                     max = i_proc.code.mem[j].data.func_call.var_num;
             }
         }
+        if (max == 0) {
+            fprintf(stderr,
+                    "At least one variable in function <%s> is required.",
+                    i_proc.name);
+            exit(1);
+        }
 
         // Proc header
         // <i_proc.name>:
@@ -79,15 +92,15 @@ vec_char fasm_generate(ir_Program program) {
         vecPush_str(&lines, str_clone("push ebp\n"));
         vecPush_str(&lines, str_clone("mov ebp, esp\n"));
 
+        // Allocate variables
+        // sub esp, <max * 4>
+        assert_nm1(asprintf(&buffer, "sub esp, %u\n", max_my(max, 2) * 4),
+                   "Formatting error.\n");
+        vecPush_str(&lines, buffer);
+
         // Move arguments to $1 and $2
         vecPush_str(&lines, str_clone("mov [ebp-4], esi\n"));
         vecPush_str(&lines, str_clone("mov [ebp-8], edi\n"));
-
-        // Allocate variables
-        // sub esp, <max * 4>
-        assert_nm1(asprintf(&buffer, "sub esp, %u\n", max * 4),
-                   "Formatting error.\n");
-        vecPush_str(&lines, buffer);
 
         for (size_t j = 0; j < i_proc.code.len; j++) {
             ir_IrItem item = i_proc.code.mem[j];
@@ -205,12 +218,7 @@ vec_char fasm_generate(ir_Program program) {
                    "Formatting error.\n");
         vecPush_str(&lines, buffer);
 
-        // Deallocate variables
-        // add esp, <max * 4>
-        assert_nm1(asprintf(&buffer, "add esp, %u\n", max * 4),
-                   "Formatting error.\n");
-        vecPush_str(&lines, buffer);
-
+        vecPush_str(&lines, str_clone("mov esp, ebp\n"));
         vecPush_str(&lines, str_clone("pop ebp\n"));
         vecPush_str(&lines, str_clone("ret\n"));
     }
