@@ -103,6 +103,7 @@ ir_Program compile(vec_Tok toks) {
 
             some_proc.name = str_clone(name.data.name);
             vecPush_ir_Proc(&program.procs, some_proc);
+            some_proc.code = vecNew_ir_IrItem();
         }
     }
 

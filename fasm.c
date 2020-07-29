@@ -17,11 +17,14 @@ const char* const CODE_TEMPLATE_START =
     "include 'itoa.asm'\n"
     "\n"
     "start:\n"
-    "mov eax,0\n"
+    "mov esi,0\n"
+    "mov edi,0\n"
     "call main\n"
-    "; eax is proc result\n"
+    "; esi is proc result\n"
     "\n"
-    "; Now print eax\n"
+    "; Now calculate itoa(esi) and print it\n"
+    "; Move esi to eax, itoa argument\n"
+    "mov eax,esi\n"
     "mov edi,output_buffer\n"
     "call itoa\n"
     "\n"
@@ -54,12 +57,30 @@ vec_char fasm_generate(ir_Program program) {
     for (size_t i = 0; i < program.procs.len; i++) {
         ir_Proc i_proc = program.procs.mem[i];
 
+        char* buffer;
+
+        u16 max = 0;
+        // Find max var_num
+        for (size_t j = 0; j < i_proc.code.len; j++)
+            if (i_proc.code.mem[j].var_num > max)
+                max = i_proc.code.mem[j].var_num;
+
         // Proc header
         // <i_proc.name>:
         vecPush_str(&lines, str_clone(i_proc.name));
         vecPush_str(&lines, str_clone(":\n"));
         vecPush_str(&lines, str_clone("push ebp\n"));
         vecPush_str(&lines, str_clone("mov ebp, esp\n"));
+
+        // Move arguments to $1 and $2
+        vecPush_str(&lines, str_clone("mov [ebp-4], esi\n"));
+        vecPush_str(&lines, str_clone("mov [ebp-8], edi\n"));
+
+        // Allocate variables
+        // sub esp, <max * 4>
+        assert_nm1(asprintf(&buffer, "sub esp, %u\n", max * 4),
+                   "Formatting error.\n");
+        vecPush_str(&lines, buffer);
 
         for (size_t j = 0; j < i_proc.code.len; j++) {
             ir_IrItem item = i_proc.code.mem[j];
@@ -100,30 +121,61 @@ vec_char fasm_generate(ir_Program program) {
                         vecPush_str(&lines, buffer);
                     } else {
                         // Call func <func.func_name>
-                        // TODO
+
+                        char* buffer;
+
+                        // Store esi and edi to stack
+                        vecPush_str(&lines, str_clone("push esi\n"));
+                        vecPush_str(&lines, str_clone("push edi\n"));
+
+                        // mov esi, [ebp-arg1_varnum*4]\n
+                        assert_nm1(asprintf(&buffer, "mov esi, [ebp-%u]\n",
+                                            func.arg1_varnum * 4),
+                                   "Formatting error.\n");
+                        vecPush_str(&lines, buffer);
+
+                        // mov edi, [ebp-arg2_varnum*4]\n
+                        assert_nm1(asprintf(&buffer, "mov edi, [ebp-%u]\n",
+                                            func.arg2_varnum * 4),
+                                   "Formatting error.\n");
+                        vecPush_str(&lines, buffer);
+
+                        // call <func.func_name>
+                        assert_nm1(
+                            asprintf(&buffer, "call %s\n", func.func_name),
+                            "Formatting error.\n");
+                        vecPush_str(&lines, buffer);
+
+                        // mov [ebp-var_num*4], esi\n
+                        assert_nm1(asprintf(&buffer, "mov [ebp-%i], esi\n",
+                                            item.var_num * 4),
+                                   "Formatting error.\n");
+                        vecPush_str(&lines, buffer);
+
+                        // Restore esi and edi from stack
+                        vecPush_str(&lines, str_clone("pop edi\n"));
+                        vecPush_str(&lines, str_clone("pop esi\n"));
                     }
                     break;
                 }
 
                 default:
+                    fprintf(stderr, "<%i>", item.tag);
                     panic("Unknown item.tag\n");
                     exit(1);
                     break;
             }
         }
 
-        // Write last Var to eax
-        u16 max = 0;
-        {  // Find max var_num
-            for (size_t j = 0; j < i_proc.code.len; j++) {
-                if (i_proc.code.mem[j].var_num > max) {
-                    max = i_proc.code.mem[j].var_num;
-                }
-            }
-        }
-        char* buffer;
-        // mov ebx, [ebp-arg1_varnum*4]\n
-        assert_nm1(asprintf(&buffer, "mov eax, [ebp-%u]\n", max * 4),
+        // Write last Var to esi
+        // mov esi, [ebp-max*4]\n
+        assert_nm1(asprintf(&buffer, "mov esi, [ebp-%u]\n", max * 4),
+                   "Formatting error.\n");
+        vecPush_str(&lines, buffer);
+
+        // Deallocate variables
+        // add esp, <max * 4>
+        assert_nm1(asprintf(&buffer, "add esp, %u\n", max * 4),
                    "Formatting error.\n");
         vecPush_str(&lines, buffer);
 

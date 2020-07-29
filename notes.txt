@@ -1,0 +1,4 @@
+Calling convention inside the language:
+Function argument 1 -- esi
+Function argument 2 -- edi
+Return -- esi
