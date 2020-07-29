@@ -1,4 +1,28 @@
 $1 8 =
-$2 4 =
-$3 $2 $1 funcadd call
+$1 $1 $1 fib call
 main makeproc
+
+
+
+$1000 0 =
+$2 0 =
+$3 $2 $1 funceq call
+endFib $3 ?
+
+$1000 1 =
+$2 1 =
+$3 $2 $1 funceq call
+endFib $3 ?
+
+$2 1 =
+$101 $2 $1 funcsub call
+$501 $101 $101 fib call
+
+$2 2 =
+$101 $2 $1 funcsub call
+$502 $101 $101 fib call
+
+$1000 $501 $502 funcadd call
+
+endFib:
+fib makeproc
