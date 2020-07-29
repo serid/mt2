@@ -108,7 +108,6 @@ vec_char fasm_generate(ir_Program program) {
                 case IR_ITEM_TAG_CONST_ASSIGN: {
                     // move const to a Var
                     // mov dword [ebp-<var_number*4>], <item.data.int_lit>
-                    char* buffer;
                     assert_nm1(asprintf(&buffer, "mov dword [ebp-%i], %u\n",
                                         item.data.const_assign.var_num * 4,
                                         item.data.const_assign.int_lit),
@@ -122,7 +121,6 @@ vec_char fasm_generate(ir_Program program) {
                     /*// check builtin functions
                     if (strcmp(func.func_name, "add") == 0) {
                         // Builtin add
-                        char* buffer;
                         // mov ebx, [ebp-arg1_varnum*4]\n
                         assert_nm1(asprintf(&buffer, "mov ebx, [ebp-%u]\n",
                                             func.arg1_varnum * 4),
@@ -143,8 +141,6 @@ vec_char fasm_generate(ir_Program program) {
                     } else */
                     {
                         // Call func <func.func_name>
-
-                        char* buffer;
 
                         // mov esi, [ebp-arg1_varnum*4]\n
                         assert_nm1(asprintf(&buffer, "mov esi, [ebp-%u]\n",
