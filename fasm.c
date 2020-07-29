@@ -36,10 +36,11 @@ const char* const CODE_TEMPLATE_START =
     "mov edi,output_buffer\n"
     "call itoa\n"
     "\n"
+    "; Write buffer to output\n"
+    "mov edx,eax ; eax returned by itoa() is output number length with newline\n"
     "mov eax,4\n"
     "mov ebx,1\n"
     "mov ecx,output_buffer\n"
-    "mov edx,output_buffer_size\n"
     "int 0x80\n"
     "\n"
     "mov eax,1\n"
@@ -52,7 +53,7 @@ const char* const CODE_TEMPLATE_END =
     "; :PROCS\n"
     "segment readable writeable\n"
     "\n"
-    "output_buffer db 'eeeee',0xA\n"
+    "output_buffer db 'eeeeeeeeeeeeee',0xA\n"
     "output_buffer_size = $-output_buffer\n";
 
 vec_char fasm_generate(ir_Program program) {
