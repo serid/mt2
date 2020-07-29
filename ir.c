@@ -14,6 +14,9 @@ static ir_StackItem safePopStackItem(vec_ir_StackItem* stack,
             case IR_STACK_ITEM_INT_LIT:
                 fputs("Int literal expected.\n", stderr);
                 break;
+            case IR_STACK_ITEM_VAR_NUM:
+                fputs("Variable number expected.\n", stderr);
+                break;
             case IR_STACK_ITEM_IDENT:
                 fputs("Identifier expected.\n", stderr);
                 break;
@@ -28,6 +31,9 @@ static ir_StackItem safePopStackItem(vec_ir_StackItem* stack,
         switch (expected_tag) {
             case IR_STACK_ITEM_INT_LIT:
                 fputs("Int literal expected.\n", stderr);
+                break;
+            case IR_STACK_ITEM_VAR_NUM:
+                fputs("Variable number expected.\n", stderr);
                 break;
             case IR_STACK_ITEM_IDENT:
                 fputs("Identifier expected.\n", stderr);
@@ -56,34 +62,38 @@ ir_Program compile(vec_Tok toks) {
             vecPush_ir_StackItem(
                 &stack, (ir_StackItem){.tag = IR_STACK_ITEM_INT_LIT,
                                        .data.int_lit = i_token->data.int_lit});
+        } else if (i_token->tag == TOK_VAR_NUM) {
+            vecPush_ir_StackItem(
+                &stack, (ir_StackItem){.tag = IR_STACK_ITEM_VAR_NUM,
+                                       .data.var_num = i_token->data.var_num});
         } else if (i_token->tag == TOK_ASSIGN) {
             // Add an assignment to a procedure
             ir_StackItem what = safePopStackItem(&stack, IR_STACK_ITEM_INT_LIT);  // tos1
 
-            ir_StackItem var_num = safePopStackItem(&stack, IR_STACK_ITEM_INT_LIT);  // tos2
+            ir_StackItem var_num = safePopStackItem(&stack, IR_STACK_ITEM_VAR_NUM);  // tos2
 
             vecPush_ir_IrItem(&some_proc.code,
-                              (ir_IrItem){.var_num = var_num.data.int_lit,
+                              (ir_IrItem){.var_num = var_num.data.var_num,
                                           .tag = IR_ITEM_TAG_INT_LIT,
                                           .data.int_lit = what.data.int_lit});
         } else if (i_token->tag == TOK_CALL) {
             // Call a function and add an assignment to a procedure
             ir_StackItem func_name = safePopStackItem(&stack, IR_STACK_ITEM_IDENT);  // tos1
 
-            ir_StackItem arg1_varnum = safePopStackItem(&stack, IR_STACK_ITEM_INT_LIT);  // tos2
+            ir_StackItem arg1_varnum = safePopStackItem(&stack, IR_STACK_ITEM_VAR_NUM);  // tos2
 
-            ir_StackItem arg2_varnum = safePopStackItem(&stack, IR_STACK_ITEM_INT_LIT);  // tos3
+            ir_StackItem arg2_varnum = safePopStackItem(&stack, IR_STACK_ITEM_VAR_NUM);  // tos3
 
-            ir_StackItem var_num = safePopStackItem(&stack, IR_STACK_ITEM_INT_LIT);  // tos4
+            ir_StackItem var_num = safePopStackItem(&stack, IR_STACK_ITEM_VAR_NUM);  // tos4
 
             vecPush_ir_IrItem(
                 &some_proc.code,
-                (ir_IrItem){.var_num = var_num.data.int_lit,
+                (ir_IrItem){.var_num = var_num.data.var_num,
                             .tag = IR_ITEM_TAG_FUNC_CALL,
                             .data.func_call = (ir_FuncCall){
                                 .func_name = str_clone(func_name.data.name),
-                                .arg1_varnum = arg1_varnum.data.int_lit,
-                                .arg2_varnum = arg2_varnum.data.int_lit}});
+                                .arg1_varnum = arg1_varnum.data.var_num,
+                                .arg2_varnum = arg2_varnum.data.var_num}});
         } else if (i_token->tag == TOK_IDENT) {
             vecPush_ir_StackItem(
                 &stack, (ir_StackItem){.tag = IR_STACK_ITEM_IDENT,

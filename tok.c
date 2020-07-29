@@ -44,6 +44,16 @@ vec_Tok tokenize(char* text) {
             vecPush_Tok(&result,
                         (Tok){.tag = TOK_INT_LIT, .data.int_lit = res});
             i += end - (text + i);
+        } else if (text[i] == '$' && isdigit(text[i + 1])) {
+            i++;
+
+            char* end;
+            errno = 0;  // Do I need no zero it?
+            long res = strtol(&text[i], &end, 10);
+            if (errno == ERANGE) panic_errno("Int parse");
+            vecPush_Tok(&result,
+                        (Tok){.tag = TOK_VAR_NUM, .data.var_num = res});
+            i += end - (text + i);
         } else if (isalpha(text[i])) {
             vec_char name = vecNew_char();
             for (; isalpha(text[i]); i++) vecPush_char(&name, text[i]);

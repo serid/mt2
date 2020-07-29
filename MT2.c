@@ -15,9 +15,9 @@ int main(int argc, char* argv[]) {
     }
 
     vec_Tok toks = tokenize(
-        "0 100 =\n"
-        "1 50 =\n"
-        "2 0 1 add call\n"
+        "$0 100 =\n"
+        "$1 50 =\n"
+        "$2 $0 $1 add call\n"
         "main makeproc\n");
 
     // Print tokens
