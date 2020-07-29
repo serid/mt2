@@ -15,6 +15,7 @@ const char* const CODE_TEMPLATE_START =
     "segment readable executable\n"
     "\n"
     "include 'itoa.asm'\n"
+    "include 'mt2std.asm'\n"
     "\n"
     "start:\n"
     "mov esi,0\n"
@@ -105,7 +106,7 @@ vec_char fasm_generate(ir_Program program) {
 
                 case IR_ITEM_TAG_FUNC_CALL: {
                     ir_FuncCall func = item.data.func_call;
-                    // check builtin functions
+                    /*// check builtin functions
                     if (strcmp(func.func_name, "add") == 0) {
                         // Builtin add
                         char* buffer;
@@ -126,7 +127,8 @@ vec_char fasm_generate(ir_Program program) {
                                             func.var_num * 4),
                                    "Formatting error.\n");
                         vecPush_str(&lines, buffer);
-                    } else {
+                    } else */
+                    {
                         // Call func <func.func_name>
 
                         char* buffer;
