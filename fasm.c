@@ -146,10 +146,6 @@ vec_char fasm_generate(ir_Program program) {
 
                         char* buffer;
 
-                        // Store esi and edi to stack
-                        vecPush_str(&lines, str_clone("push esi\n"));
-                        vecPush_str(&lines, str_clone("push edi\n"));
-
                         // mov esi, [ebp-arg1_varnum*4]\n
                         assert_nm1(asprintf(&buffer, "mov esi, [ebp-%u]\n",
                                             func.arg1_varnum * 4),
@@ -173,10 +169,6 @@ vec_char fasm_generate(ir_Program program) {
                                             func.var_num * 4),
                                    "Formatting error.\n");
                         vecPush_str(&lines, buffer);
-
-                        // Restore esi and edi from stack
-                        vecPush_str(&lines, str_clone("pop edi\n"));
-                        vecPush_str(&lines, str_clone("pop esi\n"));
                     }
                     break;
                 }
