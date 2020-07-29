@@ -166,6 +166,31 @@ vec_char fasm_generate(ir_Program program) {
                     break;
                 }
 
+                case IR_ITEM_TAG_LABEL: {
+                    vecPush_str(&lines, str_clone(item.data.label_name));
+                    vecPush_str(&lines, str_clone(":\n"));
+                    break;
+                }
+
+                case IR_ITEM_TAG_MAYBE: {
+                    // Conditionally jump to label if [<condition_varnum>] != 0
+
+                    // mov eax, [ebp-<condition_varnum*4>]\n
+                    assert_nm1(asprintf(&buffer, "mov eax, [ebp-%i]\n",
+                                        item.data.maybe.condition_varnum * 4),
+                               "Formatting error.\n");
+                    vecPush_str(&lines, buffer);
+
+                    vecPush_str(&lines, str_clone("test eax, eax\n"));
+
+                    // jnz <label_name>\n
+                    assert_nm1(asprintf(&buffer, "jnz %s\n",
+                                        item.data.maybe.label_name),
+                               "Formatting error.\n");
+                    vecPush_str(&lines, buffer);
+                    break;
+                }
+
                 default:
                     fprintf(stderr, "<%i>", item.tag);
                     panic("Unknown item.tag\n");

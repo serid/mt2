@@ -12,13 +12,22 @@ typedef struct {
     u32 int_lit;
 } ir_ConstAssign;
 
+typedef struct {
+    char* label_name;
+    u32 condition_varnum;
+} ir_Maybe;
+
 #define IR_ITEM_TAG_CONST_ASSIGN 1
 #define IR_ITEM_TAG_FUNC_CALL 2
+#define IR_ITEM_TAG_LABEL 3
+#define IR_ITEM_TAG_MAYBE 4
 typedef struct {
     u8 tag;
     union {
         ir_ConstAssign const_assign;  // tag IR_ITEM_TAG_CONST_ASSIGN
         ir_FuncCall func_call;        // tag IR_ITEM_TAG_FUNC_CALL
+        char* label_name;             // tag IR_ITEM_TAG_LABEL
+        ir_Maybe maybe;               // tag IR_ITEM_TAG_MAYBE
     } data;
 } ir_IrItem;
 

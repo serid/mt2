@@ -105,6 +105,28 @@ ir_Program compile(vec_Tok toks) {
             vecPush_ir_StackItem(
                 &stack, (ir_StackItem){.tag = IR_STACK_ITEM_IDENT,
                                        .data.name = i_token->data.name});
+        } else if (i_token->tag == TOK_LABEL) {
+            ir_StackItem label_name =
+                safePopStackItem(&stack, IR_STACK_ITEM_IDENT);  // tos1
+
+            vecPush_ir_IrItem(
+                &some_proc.code,
+                (ir_IrItem){.tag = IR_ITEM_TAG_LABEL,
+                            .data.label_name = str_clone(label_name.data.name)});
+        } else if (i_token->tag == TOK_MAYBE) {
+            ir_StackItem condition_var_num =
+                safePopStackItem(&stack, IR_STACK_ITEM_VAR_NUM);  // tos1
+
+            ir_StackItem label_name =
+                safePopStackItem(&stack, IR_STACK_ITEM_IDENT);  // tos2
+
+            vecPush_ir_IrItem(
+                &some_proc.code,
+                (ir_IrItem){
+                    .tag = IR_ITEM_TAG_MAYBE,
+                    .data.maybe = (ir_Maybe){
+                        .label_name = str_clone(label_name.data.name),
+                        .condition_varnum = condition_var_num.data.var_num}});
         } else if (i_token->tag == TOK_MAKEPROC) {
             ir_StackItem name =
                 safePopStackItem(&stack, IR_STACK_ITEM_IDENT);  // tos1
