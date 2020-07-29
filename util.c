@@ -9,6 +9,8 @@
 
 #include "panic.h"
 
+#define PAGE_SIZE 4096
+
 char* str_clone(const char* str) {
     char* mem =
         assert_pnnull(malloc(strlen(str) + 1), "Unable to allocate string\n");
@@ -32,4 +34,17 @@ void write_bytes(char* filename, vec_char* bytes) {
         panic_errno("File write");
     }
     close(fd);
+}
+
+vec_char read_bytes(char* filename) {
+    //Will not work for big files (>4KiB)
+    int fd = assert_nm1_errno(open(filename, O_RDONLY), "File opening failed");
+
+    vec_char result = vecNewWithLen_char(PAGE_SIZE);
+    int bytes_read = read(fd, result.mem, PAGE_SIZE);
+
+    vecResize_char(&result, bytes_read);
+    vecShrinkToFit_char(&result);
+
+    return result;
 }

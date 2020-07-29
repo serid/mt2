@@ -8,3 +8,5 @@ set(CMAKE_CXX_COMPILER "clang")
 add_executable(MT2 MT2.c vec.c vec.h panic.c panic.h util.c util.h
     tok.c tok.h tok_Tok.h vec_Tok.h fasm.c fasm.h ir.c ir.h ir_Proc.h ir_IrItem.h
     ir_StackItem.h vec_ir_StackItem.h vec_ir_Proc.h vec_ir_IrItem.h ints.h)
+
+target_compile_options(MT2 PUBLIC -g)

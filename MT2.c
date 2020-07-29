@@ -9,17 +9,17 @@
 int main(int argc, char* argv[]) {
     puts("Hello, world!");
 
-    if (argc < 2) {
-        fputs("Usage: MT2 [OUTPUT_FILE_NAME]\n", stderr);
+    if (argc < 3) {
+        fputs("Usage: MT2 INPUT_FILE_NAME OUTPUT_FILE_NAME\n", stderr);
         exit(1);
     }
 
-    vec_Tok toks = tokenize(
-        "$3 $1 $1 add call\n"
-        "double makeproc\n"
-        "$1 512 =\n"
-        "$3 $1 $1 double call\n"
-        "main makeproc\n");
+    vec_char input = read_bytes(argv[1]);
+    vecPush_char(&input, '\0');
+
+    vec_Tok toks = tokenize(input.mem);
+
+    vecDestroy_char(&input);
 
     // Print tokens
     for (size_t i = 0; i < toks.len; i++) printf("%i,", toks.mem[i].tag);
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
     vecDestroy_Tok(&toks);
 
     vec_char compiled_code = fasm_generate(program);
-    write_bytes(argv[1], &compiled_code);
+    write_bytes(argv[2], &compiled_code);
     vecDestroy_char(&compiled_code);
 
     destroy_ir_Program(&program);
